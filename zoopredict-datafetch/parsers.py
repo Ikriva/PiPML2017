@@ -3,7 +3,6 @@
 # Parsers for input data formats.
 #
 # Author: Mika Wahlroos
-s
 
 import xml.etree.ElementTree as ElementTree
 import dateutil.parser
