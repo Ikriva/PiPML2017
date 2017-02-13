@@ -45,8 +45,10 @@ def get_weather_observation_history(apikey, output_path):
 
     location = 'kaisaniemi'
     all_obs = []
-    for year in ['2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017']:
-        obs = get_daily_fmi_weather_observations(location, year+'-01-01', year+'-12-31', apikey)
+
+    for year in ['2010', '2011', '2012', '2013', '2014', '2015', '2016']:
+        #obs = get_daily_fmi_weather_observations(location, year+'-01-01', year+'-12-31', apikey)
+        obs = get_daily_fmi_weather_observations(location, year + '-01-01', year + '-03-31', apikey)
         all_obs.extend(obs)
 
     with open(output_path, "w") as f:
