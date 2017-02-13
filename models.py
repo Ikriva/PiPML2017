@@ -16,13 +16,19 @@ class WeatherObservation(db.Model):
     precipitation = db.Column(db.Float)
     snow_depth = db.Column(db.Float)
 
-    def __init__(self, temp_max, date, temp_min, temp_mean, precipitation, snow_depth):
-        self.temp_max = temp_max
+    def __init__(self, date):
         self.date = date
-        self.temp_min = temp_min
-        self.temp_mean = temp_mean
-        self.precipitation = precipitation
-        self.snow_depth = snow_depth
+
+    def __repr__(self):
+        repr_template = "WeatherObservation(date={date}, precipitation={prec}, temp_mean={tmean}, " \
+             + "snow_depth={snow}, temp_min={tmin}, temp_max={tmax})"
+        return repr_template.format(
+                date=repr(self.date), prec=repr(self.precipitation), tmean=repr(self.temp_mean),
+                snow=repr(self.snow_depth), tmin=repr(self.temp_min), tmax=repr(self.temp_max)
+        )
+
+    def __str__(self):
+        return repr(self)
 
 
 class ZooStatistic(db.Model):
