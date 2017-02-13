@@ -9,7 +9,8 @@ import requests
 import csv
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+
+logger = logging.getLogger(__name__)
 
 
 def get_daily_fmi_weather_observations(location, start_date, end_date, api_key):

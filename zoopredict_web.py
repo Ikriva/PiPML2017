@@ -3,13 +3,16 @@
 # and prediction accuracy.
 
 import logging
+import logging.config
 
 from flask import Flask, render_template
 from flask_babel import Babel
 
 import models
+import config
 
-logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -26,4 +29,5 @@ def index():
 
 
 if __name__ == "__main__":
+    logging.config.dictConfig(config.LOGGING_CONF)
     app.run()
