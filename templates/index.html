@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}
+    <title>{{ _("Hello, World!") }}</title>
+{% endblock title %}
+
+{% block body %}
+    <h1>{{ _("Hello, World!") }}</h1>
+
+    {% if error %}
+        <div class="errors">
+            <p class="error">{{ error }}</p>
+        </div>
+    {% endif %}
+
+{% endblock body %}
