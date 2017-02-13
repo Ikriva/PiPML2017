@@ -5,7 +5,6 @@
 # Author: Mika Wahlroos
 
 import xml.etree.ElementTree as ElementTree
-import dateutil.parser
 
 import datetime
 import logging
@@ -22,11 +21,11 @@ namespaces = {
 
 class WeatherDaily(object):
 
-    def __init__(self, timestamp, precipitation=None, temp_mean=None, snow_depth=None, temp_min=None, temp_max=None):
-        if not isinstance(timestamp, datetime.datetime):
-            timestamp = dateutil.parser.parse(timestamp)
+    def __init__(self, date, precipitation=None, temp_mean=None, snow_depth=None, temp_min=None, temp_max=None):
+        if not isinstance(date, datetime.date):
+            date = _parse_fmi_date(date)
 
-        self.timestamp = timestamp
+        self.date = date
         self.precipitation = precipitation
         self.temp_mean = temp_mean
         self.snow_depth = snow_depth
@@ -35,7 +34,7 @@ class WeatherDaily(object):
 
     def as_dict(self):
         return {
-            'timestamp': self.timestamp,
+            'date': self.date,
             'precipitation': self.precipitation,
             'temp_mean': self.temp_mean,
             'snow_depth': self.snow_depth,
@@ -44,10 +43,10 @@ class WeatherDaily(object):
         }
 
     def __repr__(self):
-        repr_template = "WeatherObservation(timestamp={ts}, precipitation={prec}, temp_mean={tmean}, " \
+        repr_template = "WeatherObservation(date={date}, precipitation={prec}, temp_mean={tmean}, " \
              + "snow_depth={snow}, temp_min={tmin}, temp_max={tmax})"
         return repr_template.format(
-                ts=repr(self.timestamp), prec=repr(self.precipitation), tmean=repr(self.temp_mean),
+                date=repr(self.date), prec=repr(self.precipitation), tmean=repr(self.temp_mean),
                 snow=repr(self.snow_depth), tmin=repr(self.temp_min), tmax=repr(self.temp_max)
         )
 
@@ -61,11 +60,11 @@ class FMIWeatherObservationParser(object):
         root = ElementTree.fromstring(input_string)
         for element in root.findall('./wfs:member/BsWfs:BsWfsElement', namespaces=namespaces):
             timestamp_str = element.find('BsWfs:Time', namespaces=namespaces).text
-            timestamp = dateutil.parser.parse(timestamp_str)
+            date = _parse_fmi_date(timestamp_str)
 
-            observation = self.observations.get(timestamp, None)
+            observation = self.observations.get(date, None)
             if observation is None:
-                observation = WeatherDaily(timestamp)
+                observation = WeatherDaily(date)
 
             if element.find('BsWfs:ParameterName', namespaces=namespaces).text == 'rrday':
                 observation.precipitation = float(element.find('BsWfs:ParameterValue', namespaces=namespaces).text)
@@ -78,12 +77,15 @@ class FMIWeatherObservationParser(object):
             elif element.find('BsWfs:ParameterName', namespaces=namespaces).text == 'snow':
                 observation.snow_depth = float(element.find('BsWfs:ParameterValue', namespaces=namespaces).text)
 
-            self.observations[timestamp] = observation
+            self.observations[date] = observation
 
-    def get_daily_observation(self, timestamp):
-        if not isinstance(timestamp, datetime.datetime):
-            timestamp = dateutil.parser.parse(timestamp)
-        return self.observations[timestamp]
+    def get_daily_observation(self, date):
+        return self.observations[date]
 
     def get_observations(self):
         return self.observations.values()
+
+
+def _parse_fmi_date(date_string):
+    dt = datetime.datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%SZ")
+    return datetime.date(year=dt.year, month=dt.month, day=dt.day)

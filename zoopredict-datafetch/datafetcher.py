@@ -30,10 +30,10 @@ def get_daily_fmi_weather_observations(location, start_date, end_date, api_key):
 
 
 def write_weather_observations(observations, outstream):
-    obs_sorted = sorted(observations, key=lambda o: o.timestamp)
+    obs_sorted = sorted(observations, key=lambda o: o.date)
     obs_dicts = [o.as_dict() for o in obs_sorted]
 
-    fieldnames = ['timestamp', 'precipitation', 'temp_mean', 'snow_depth', 'temp_min', 'temp_max']
+    fieldnames = ['date', 'precipitation', 'temp_mean', 'snow_depth', 'temp_min', 'temp_max']
     writer = csv.DictWriter(outstream, fieldnames=fieldnames)
     writer.writeheader()
     for d in obs_dicts:
