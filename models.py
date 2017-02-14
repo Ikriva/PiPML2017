@@ -14,17 +14,20 @@ class WeatherObservation(db.Model):
     temp_min = db.Column(db.Float)
     temp_mean = db.Column(db.Float)
     precipitation = db.Column(db.Float)
-    snow_depth = db.Column(db.Float)
 
-    def __init__(self, date):
+    def __init__(self, date, temp_max=None, temp_min=None, temp_mean=None, precipitation=None):
         self.date = date
+        self.temp_max = temp_max
+        self.temp_min = temp_min
+        self.temp_mean = temp_mean
+        self.precipitation = precipitation
 
     def __repr__(self):
         repr_template = "WeatherObservation(date={date}, precipitation={prec}, temp_mean={tmean}, " \
-             + "snow_depth={snow}, temp_min={tmin}, temp_max={tmax})"
+             + "temp_min={tmin}, temp_max={tmax})"
         return repr_template.format(
                 date=repr(self.date), prec=repr(self.precipitation), tmean=repr(self.temp_mean),
-                snow=repr(self.snow_depth), tmin=repr(self.temp_min), tmax=repr(self.temp_max)
+                tmin=repr(self.temp_min), tmax=repr(self.temp_max)
         )
 
     def __str__(self):

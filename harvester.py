@@ -27,20 +27,19 @@ def harvest(app):
     fmi_api_key = _get_fmi_api_key(app.config['FMI_API_KEY_PATH'])
     location = app.config['FMI_WEATHER_LOCATION']
 
-    # retrieve FMI weather observations from the previous day
-    # FIXME: should be changed to get forecasts for the next day instead
-
-    offset = datetime.timedelta(days=-1)
+    # retrieve FMI weather forecast for the next day
+    offset = datetime.timedelta(days=1)
     today = datetime.datetime.now().date()
 
     date = today + offset
 
-    logger.info("Fetching FMI weather data for {d}".format(d=str(date)))
-    observations = datafetcher.get_daily_fmi_weather_observations(location, date, date, fmi_api_key)
+    logger.info("Fetching FMI weather forecast data for {d}".format(d=str(date)))
+    observations = datafetcher.get_daily_fmi_weather_forecast(location, date, date, fmi_api_key)
 
     with app.app_context():
-        for o in observations:
-            db.session.add(o)
+        for obs in observations:
+            logger.debug("Got observation: {o}".format(o=str(obs)))
+            db.session.add(obs)
         db.session.commit()
 
 

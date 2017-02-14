@@ -3,12 +3,14 @@
 #
 # The same configuration is used by both the data harvester and the web UI.
 
-#SQLALCHEMY_DATABASE_URI = "sqlite:///zoopredict.db"
-SQLALCHEMY_DATABASE_URI = "sqlite://"
+SQLALCHEMY_DATABASE_URI = "sqlite:///zoopredict.db"
+#SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 DEBUG = True
 
-FMI_WEATHER_LOCATION = "kaisaniemi"
+#FMI_WEATHER_LOCATION = "kaisaniemi"
+#FMI_WEATHER_LOCATION = "60.17523 24.94459" # Kaisaniemi
+FMI_WEATHER_LOCATION = "60.16952 24.93545"  # Helsinki
 FMI_API_KEY_PATH = "fmi_api_key.txt"
 
 # based on the configuration example at
