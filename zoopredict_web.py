@@ -21,7 +21,7 @@ app.config.from_object("config")
 babel = Babel(app)
 
 # Initialize the SQLAlchemy db with the app to set configuration
-#models.db.init_app(app)
+models.db.init_app(app)
 
 
 @app.route("/")
