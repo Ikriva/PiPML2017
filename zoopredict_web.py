@@ -30,4 +30,6 @@ def index():
 
 if __name__ == "__main__":
     logging.config.dictConfig(config.LOGGING_CONF)
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(port=port)
+
