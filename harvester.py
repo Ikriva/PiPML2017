@@ -8,6 +8,7 @@
 import logging
 import logging.config
 import datetime
+import os
 
 from flask import Flask
 
@@ -44,9 +45,15 @@ def harvest(app):
 
 
 def _get_fmi_api_key(api_key_path):
-    logger.debug("Reading API key from {p}".format(p=api_key_path))
-    with open(api_key_path, 'r') as f:
-        api_key = f.read().strip()
+    logger.debug("Checking for API key in $FMI_API_KEY")
+    api_key = os.environ.get('FMI_API_KEY', None)
+
+    if not api_key:
+        # no environment variable found, so try from a file
+        logger.debug("Reading API key from {p}".format(p=api_key_path))
+        with open(api_key_path, 'r') as f:
+            api_key = f.read().strip()
+
     return api_key
 
 
