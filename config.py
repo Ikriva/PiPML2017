@@ -3,8 +3,8 @@
 #
 # The same configuration is used by both the data harvester and the web UI.
 
-SQLALCHEMY_DATABASE_URI = "sqlite:///zoopredict.db"
-#SQLALCHEMY_DATABASE_URI = "sqlite://"
+#SQLALCHEMY_DATABASE_URI = "sqlite:///zoopredict.db"
+SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 DEBUG = True
 FLASK_DEBUG = False
