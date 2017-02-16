@@ -21,7 +21,7 @@ app.config.from_object("config")
 babel = Babel(app)
 
 # Initialize the SQLAlchemy db with the app to set configuration
-models.db.init_app(app)
+#models.db.init_app(app)
 
 
 @app.route("/")
@@ -31,6 +31,6 @@ def index():
 
 if __name__ == "__main__":
     logging.config.dictConfig(config.LOGGING_CONF)
-    port = int(os.environ.get("PORT", 5000))
-    app.run(port=port)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
 
