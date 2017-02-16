@@ -17,7 +17,8 @@ class oldZooDataExtractor:
         # Which months to be included 1-12
         months_included = [1,2,3]
         #Which years to be included 2016-2011
-        years = [2016, 2015, 2014, 2013, 2012, 2011, 2010]
+        #years = [2016, 2015, 2014, 2013, 2012, 2011, 2010]
+        years = [2010, 2011, 2012, 2013, 2014, 2015, 2016]
 
         for year in years:
             self.output.append(self.read_one_year_statistics(months_included,year))
