@@ -30,4 +30,4 @@ def index():
 
 if __name__ == "__main__":
     logging.config.dictConfig(config.LOGGING_CONF)
-    app.run()
+    app.run(debug=config.FLASK_DEBUG)

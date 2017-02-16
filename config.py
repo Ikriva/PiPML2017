@@ -7,6 +7,7 @@ SQLALCHEMY_DATABASE_URI = "sqlite:///zoopredict.db"
 #SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 DEBUG = True
+FLASK_DEBUG = False
 
 #FMI_WEATHER_LOCATION = "kaisaniemi"
 #FMI_WEATHER_LOCATION = "60.17523 24.94459" # Kaisaniemi
