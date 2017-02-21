@@ -39,9 +39,11 @@ class ZooStatistic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
     visitors = db.Column(db.Integer, nullable=False)
+    visitors_class = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, date, visitors):
+    def __init__(self, date, visitors, visitors_class):
         self.date = date
         self.visitors = visitors
+        self.visitors_class = visitors_class
 
 
