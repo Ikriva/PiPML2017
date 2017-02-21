@@ -5,17 +5,16 @@
 # weather and zoo visitor data from online sources.
 # The command-line harvester should be set to automatically run once a day.
 
+import datetime
 import logging
 import logging.config
-import datetime
 import os
 
 from flask import Flask
 
-import models
 import config
 import datafetcher
-
+import models
 
 logger = logging.getLogger(__name__)
 
