@@ -1,3 +1,7 @@
 .idea
 *.pyc
+
+# SQLite database files
+*.db
+
 fmi_api_key.txt
