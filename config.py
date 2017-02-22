@@ -14,6 +14,18 @@ FLASK_DEBUG = False
 FMI_WEATHER_LOCATION = "60.16952 24.93545"  # Helsinki
 FMI_API_KEY_PATH = "fmi_api_key.txt"
 
+VISITOR_CLASSES = {
+    "low": {
+        "min": 0
+    },
+    "medium": {
+        "min": 101
+    },
+    "high": {
+        "min": 251
+    }
+}
+
 # based on the configuration example at
 # https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 LOGGING_CONF = {
