@@ -13,7 +13,6 @@ from flask import Flask
 
 import config
 
-VISITOR_CLASS_LABELS = ["low", "medium", "high"]
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
@@ -48,8 +47,6 @@ class ModelBuilder(object):
         data['visitors_normalized'] = visitors_normalized
 
     def build_model(self, visitor_data, weather_data):
-        visitor_classes = self._app.config['VISITOR_CLASSES']
-
         self._preprocess_visitor_data(visitor_data)
         self._preprocess_weather_data(weather_data)
 
