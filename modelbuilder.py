@@ -54,6 +54,13 @@ class ModelBuilder(object):
 
         full_data = pd.merge(visitor_data, weather_data, on='datetime')
 
+        # the datetime column is irrelevant as a feature and makes conversion
+        # to a numeric array more difficult, so remove it
+        del full_data['datetime']
+
+        # convert categorical features to binary numerical features
+        pd.get_dummies(full_data, columns=['weekday'])
+
 
 def main():
     logging.config.dictConfig(config.LOGGING_CONF)
