@@ -33,8 +33,9 @@ class ModelBuilder(object):
     def _preprocess_visitor_data(self, data):
         # add visitor count classes to the data frame
         visitor_config = self._app.config['VISITOR_CLASSES']
+
         visitors_config_kvpairs = sorted(visitor_config.items(), key=lambda kvpair: kvpair[1]['min'])
-        class_labels = [kvpair[0] for kvpair in visitors_config_kvpairs]
+        class_labels = [i for i, v in enumerate(visitors_config_kvpairs)]
         class_edges = [kvpair[1]['min'] for kvpair in visitors_config_kvpairs]
 
         # pd.cut seems to want a max value for the last bin too, so add infinity as max
@@ -59,7 +60,7 @@ class ModelBuilder(object):
         del full_data['datetime']
 
         # convert categorical features to binary numerical features
-        pd.get_dummies(full_data, columns=['weekday'])
+        full_data = pd.get_dummies(full_data, columns=['weekday'])
 
 
 def main():
