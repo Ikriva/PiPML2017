@@ -26,7 +26,9 @@ class ModelBuilder(object):
         self._app = app
 
     def _preprocess_weather_data(self, data):
-        pass
+        # the data contains precipitation values of -1.0 for a lot of days, so
+        # set all negative precipitation values to zero
+        data.loc[data['precipitation'] < 0.0, 'precipitation'] = 0.0
 
     def _preprocess_visitor_data(self, data):
         # add visitor count classes to the data frame
