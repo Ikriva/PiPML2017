@@ -9,12 +9,17 @@ import logging
 import logging.config
 
 import pandas as pd
+from sklearn import linear_model
+from sklearn.svm import SVC, LinearSVC, SVR, LinearSVR
 import numpy as np
 from flask import Flask
 
 import config
 
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+DEFAULT_PREDICTORS = ['temp_max', 'precipitation'] + ['weekday_' + wd for wd in WEEKDAYS]
+DEFAULT_TARGET = 'visitors'
 
 TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
 TRAINING_DATA_PATH_WEATHER = "data/weather_observations_jan-mar_2010-2016.csv"
@@ -49,7 +54,7 @@ class ModelBuilder(object):
         visitors_normalized = data.groupby('weekday')['visitors'].transform(lambda x: x / x.mean())
         data['visitors_normalized'] = visitors_normalized
 
-    def build_model(self, visitor_data, weather_data):
+    def build_model(self, visitor_data, weather_data, predictors=DEFAULT_PREDICTORS, target=DEFAULT_TARGET):
         self._preprocess_visitor_data(visitor_data)
         self._preprocess_weather_data(weather_data)
 
@@ -61,6 +66,14 @@ class ModelBuilder(object):
 
         # convert categorical features to binary numerical features
         full_data = pd.get_dummies(full_data, columns=['weekday'])
+
+        X = full_data[predictors].as_matrix()
+        y = full_data[target].as_matrix()
+
+        #model = linear_model.LinearRegression()
+        model = SVC()
+        model.fit(X, y)
+        return model
 
 
 def main():
