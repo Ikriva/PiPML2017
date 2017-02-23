@@ -7,6 +7,7 @@
 
 from __future__ import print_function
 
+import collections
 import logging
 import logging.config
 
@@ -27,6 +28,8 @@ DEFAULT_TARGET = 'visitors_class'
 TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
 TRAINING_DATA_PATH_WEATHER = "data/weather_observations_jan-mar_2010-2016.csv"
 
+logger = logging.getLogger(__name__)
+
 
 class ModelBuilder(object):
 
@@ -40,16 +43,21 @@ class ModelBuilder(object):
 
     def _preprocess_visitor_data(self, data):
         # add visitor count classes to the data frame
-        visitor_config = self._app.config['VISITOR_CLASSES']
+        visitor_classes_config = self._app.config['VISITOR_CLASSES']
 
-        visitors_config_kvpairs = sorted(visitor_config.items(), key=lambda kvpair: kvpair[1]['min'])
-        class_labels = [i for i, v in enumerate(visitors_config_kvpairs)]
-        class_edges = [kvpair[1]['min'] for kvpair in visitors_config_kvpairs]
+        classes = collections.OrderedDict(sorted(visitor_classes_config.items(),
+                                          key=lambda class_dict: class_dict[1]['min']))
+
+        logging.debug("Classes config after sorting: {c}".format(c=classes))
+
+        # use numeric indexes as class labels (easier with scikit-learn)
+        class_labels = [i for i, c in enumerate(classes)]
+        class_lower_thresholds = [c['min'] for c in classes.values()]
 
         # pd.cut seems to want a max value for the last bin too, so add infinity as max
-        class_edges.append(float('inf'))
+        class_lower_thresholds.append(float('inf'))
 
-        visitor_classes = pd.cut(data['visitors'], class_edges,
+        visitor_classes = pd.cut(data['visitors'], class_lower_thresholds,
                                  labels=class_labels, include_lowest=True)
         data['visitors_class'] = visitor_classes
 
@@ -57,7 +65,10 @@ class ModelBuilder(object):
         visitors_normalized = data.groupby('weekday')['visitors'].transform(lambda x: x / x.mean())
         data['visitors_normalized'] = visitors_normalized
 
-    def build_model(self, visitor_data, weather_data, predictors=DEFAULT_PREDICTORS, target=DEFAULT_TARGET):
+    def build_model(self, visitor_data, weather_data,
+                    predictors=DEFAULT_PREDICTORS,
+                    target=DEFAULT_TARGET):
+
         self._preprocess_visitor_data(visitor_data)
         self._preprocess_weather_data(weather_data)
 
