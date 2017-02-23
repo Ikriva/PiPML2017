@@ -46,4 +46,3 @@ class ZooStatistic(db.Model):
         self.visitors = visitors
         self.visitors_class = visitors_class
 
-
