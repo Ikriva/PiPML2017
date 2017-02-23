@@ -5,10 +5,13 @@
 # Written for the Project in Practical Machine Learning course, 2017,
 # University of Helsinki
 
+from __future__ import print_function
+
 import logging
 import logging.config
 
 import pandas as pd
+from sklearn.model_selection import cross_val_score
 from sklearn import linear_model
 from sklearn.svm import SVC, LinearSVC, SVR, LinearSVR
 import numpy as np
@@ -19,7 +22,7 @@ import config
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 DEFAULT_PREDICTORS = ['temp_max', 'precipitation'] + ['weekday_' + wd for wd in WEEKDAYS]
-DEFAULT_TARGET = 'visitors'
+DEFAULT_TARGET = 'visitors_class'
 
 TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
 TRAINING_DATA_PATH_WEATHER = "data/weather_observations_jan-mar_2010-2016.csv"
@@ -72,8 +75,11 @@ class ModelBuilder(object):
 
         #model = linear_model.LinearRegression()
         model = SVC()
+
+        scores = cross_val_score(model, X, y, cv=10)
+
         model.fit(X, y)
-        return model
+        return model, scores
 
 
 def main():
@@ -86,7 +92,10 @@ def main():
     weather_data = pd.read_csv(TRAINING_DATA_PATH_WEATHER)
 
     builder = ModelBuilder(app)
-    model = builder.build_model(visitor_data, weather_data)
+    model, scores = builder.build_model(visitor_data, weather_data)
+    print("Cross-validation scores:")
+    print(scores)
+    print("Mean score: {v}".format(v=np.mean(scores)))
 
 
 if __name__ == "__main__":
