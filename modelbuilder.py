@@ -10,6 +10,7 @@ from __future__ import print_function
 import collections
 import logging
 import logging.config
+import pickle
 
 import pandas as pd
 from sklearn.model_selection import cross_val_score
@@ -28,6 +29,8 @@ DEFAULT_REGRESSION_TARGET = 'visitors'
 
 TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
 TRAINING_DATA_PATH_WEATHER = "data/weather_observations_jan-mar_2010-2016.csv"
+
+DEFAULT_OUTPUT_PATH = "weather-visitors-model.dat"
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +110,9 @@ def main():
     print("Cross-validation accuracies for classification:")
     print(classification_scores)
     print("Mean accuracy: {v}".format(v=np.mean(classification_scores)))
+
+    with open(DEFAULT_OUTPUT_PATH, 'w') as f:
+        pickle.dump(classifier, f)
 
 
 if __name__ == "__main__":
