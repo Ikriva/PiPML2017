@@ -4,8 +4,8 @@
 # The same configuration is used by both the data harvester and the web UI.
 import os
 
-#SQLALCHEMY_DATABASE_URI = "sqlite:///zoopredict.db"
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', "sqlite://")
+#SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///zoopredict.db")
+SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite://")
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 DEBUG = True
