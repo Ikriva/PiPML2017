@@ -4,4 +4,7 @@
 # SQLite database files
 *.db
 
+# local virtualenv
+virtualenv
+
 fmi_api_key.txt
