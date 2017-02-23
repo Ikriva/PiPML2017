@@ -2,9 +2,11 @@
 # Project in Practical Machine Learning, University of Helsinki, 2017
 #
 # The same configuration is used by both the data harvester and the web UI.
+import os
 
 #SQLALCHEMY_DATABASE_URI = "sqlite:///zoopredict.db"
-SQLALCHEMY_DATABASE_URI = "sqlite://"
+SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', "sqlite://")
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 DEBUG = True
 FLASK_DEBUG = False
@@ -15,14 +17,17 @@ FMI_WEATHER_LOCATION = "60.16952 24.93545"  # Helsinki
 FMI_API_KEY_PATH = "fmi_api_key.txt"
 
 VISITOR_CLASSES = {
-    "low": {
-        "min": 0
+    0: {
+        "min": 0,
+        "label":"low"
     },
-    "medium": {
-        "min": 101
+    1: {
+        "min": 101,
+        "label":"medium"
     },
-    "high": {
-        "min": 251
+    2: {
+        "min": 251,
+        "label":"high"
     }
 }
 
