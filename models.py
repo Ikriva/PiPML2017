@@ -46,3 +46,13 @@ class ZooStatistic(db.Model):
         self.visitors = visitors
         self.visitors_class = visitors_class
 
+
+class PredictionModel(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    model = db.Column(db.PickleType, nullable=False)
+    is_classifier = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, model, is_classifier):
+        self.model = model
+        self.is_classifier = is_classifier

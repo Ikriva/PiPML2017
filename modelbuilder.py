@@ -7,6 +7,7 @@
 
 from __future__ import print_function
 
+import argparse
 import collections
 import logging
 import logging.config
@@ -20,6 +21,7 @@ import numpy as np
 from flask import Flask
 
 import config
+import models
 
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -27,8 +29,8 @@ DEFAULT_PREDICTORS = ['temp_max', 'precipitation'] + ['weekday_' + wd for wd in 
 DEFAULT_CLASSIFICATION_TARGET = 'visitors_class'
 DEFAULT_REGRESSION_TARGET = 'visitors'
 
-TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
-TRAINING_DATA_PATH_WEATHER = "data/weather_observations_jan-mar_2010-2016.csv"
+DEFAULT_VISITORS_TRAINING_DATA_PATH = "data/oldVisitorCounts.csv"
+DEFAULT_WEATHER_TRAINING_DATA_PATH = "data/weather_observations_jan-mar_2010-2016.csv"
 
 DEFAULT_CLASSIFIER_OUTPUT_PATH = "classifier.dump"
 DEFAULT_REGRESSION_MODEL_OUTPUT_PATH = "regression_model.dump"
@@ -101,28 +103,54 @@ class ModelBuilder(object):
         return model
 
 
+def _get_arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--store-in-database', dest='store_in_database', action='store_true',
+                        help='store the generated models in the database instead of files')
+    parser.add_argument('-w', '--weather-data-path', dest='weather_data_path',
+                        default=DEFAULT_WEATHER_TRAINING_DATA_PATH,
+                        help='path the weather data CSV file')
+    parser.add_argument('-v', '--visitor-data-path', dest='visitor_data_path',
+                        default=DEFAULT_VISITORS_TRAINING_DATA_PATH,
+                        help='path to the visitor data CSV file')
+    return parser
+
+
 def main():
     logging.config.dictConfig(config.LOGGING_CONF)
 
     app = Flask(__name__)
     app.config.from_object("config")
 
-    visitor_data = pd.read_csv(TRAINING_DATA_PATH_VISITORS)
-    weather_data = pd.read_csv(TRAINING_DATA_PATH_WEATHER)
+    argparser = _get_arg_parser()
+    args = argparser.parse_args()
+
+    visitor_data = pd.read_csv(args.visitor_data_path)
+    weather_data = pd.read_csv(args.weather_data_path)
 
     builder = ModelBuilder(app, weather_data, visitor_data)
     classifier, classification_scores = builder.build_classifier()
+    regr_model = builder.build_regression_model()
+
     print("Cross-validation accuracies for classification:")
     print(classification_scores)
     print("Mean accuracy: {v}".format(v=np.mean(classification_scores)))
 
-    with open(DEFAULT_CLASSIFIER_OUTPUT_PATH, 'w') as f:
-        pickle.dump(classifier, f)
+    if args.store_in_database:
+        with app.app_context():
+            db = models.db
+            db.init_app(app)
+            db.session.add(models.PredictionModel(classifier, True))
+            db.session.add(models.PredictionModel(regr_model, False))
+            db.session.commit()
+    else:
+        print("Writing classifier serialization into {p}".format(p=DEFAULT_CLASSIFIER_OUTPUT_PATH))
+        with open(DEFAULT_CLASSIFIER_OUTPUT_PATH, 'w') as f:
+            pickle.dump(classifier, f)
 
-    regr_model = builder.build_regression_model()
-
-    with open(DEFAULT_REGRESSION_MODEL_OUTPUT_PATH, 'w') as f:
-        pickle.dump(regr_model, f)
+        print("Writing regression model serialization into {p}".format(p=DEFAULT_REGRESSION_MODEL_OUTPUT_PATH))
+        with open(DEFAULT_REGRESSION_MODEL_OUTPUT_PATH, 'w') as f:
+            pickle.dump(regr_model, f)
 
 if __name__ == "__main__":
     main()
