@@ -30,7 +30,8 @@ DEFAULT_REGRESSION_TARGET = 'visitors'
 TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
 TRAINING_DATA_PATH_WEATHER = "data/weather_observations_jan-mar_2010-2016.csv"
 
-DEFAULT_OUTPUT_PATH = "weather-visitors-model.dat"
+DEFAULT_CLASSIFIER_OUTPUT_PATH = "classifier.dump"
+DEFAULT_REGRESSION_MODEL_OUTPUT_PATH = "regression_model.dump"
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,6 @@ class ModelBuilder(object):
         X = self.data[predictors].as_matrix()
         y = self.data[target].as_matrix()
 
-        #model = linear_model.LinearRegression()
         classifier = SVC()
 
         scores = cross_val_score(classifier, X, y, cv=10)
@@ -93,7 +93,12 @@ class ModelBuilder(object):
         return classifier, scores
 
     def build_regression_model(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_REGRESSION_TARGET):
-        pass
+        X = self.data[predictors].as_matrix()
+        y = self.data[target].as_matrix()
+
+        model = linear_model.LinearRegression()
+        model.fit(X, y)
+        return model
 
 
 def main():
@@ -111,9 +116,13 @@ def main():
     print(classification_scores)
     print("Mean accuracy: {v}".format(v=np.mean(classification_scores)))
 
-    with open(DEFAULT_OUTPUT_PATH, 'w') as f:
+    with open(DEFAULT_CLASSIFIER_OUTPUT_PATH, 'w') as f:
         pickle.dump(classifier, f)
 
+    regr_model = builder.build_regression_model()
+
+    with open(DEFAULT_REGRESSION_MODEL_OUTPUT_PATH, 'w') as f:
+        pickle.dump(regr_model, f)
 
 if __name__ == "__main__":
     main()
