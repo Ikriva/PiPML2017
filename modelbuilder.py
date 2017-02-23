@@ -155,11 +155,11 @@ def main():
             db.session.commit()
     else:
         print("Writing classifier serialization into {p}".format(p=DEFAULT_CLASSIFIER_OUTPUT_PATH))
-        with open(DEFAULT_CLASSIFIER_OUTPUT_PATH, 'w') as f:
+        with open(DEFAULT_CLASSIFIER_OUTPUT_PATH, 'wb') as f:
             pickle.dump(classifier, f)
 
         print("Writing regression model serialization into {p}".format(p=DEFAULT_REGRESSION_MODEL_OUTPUT_PATH))
-        with open(DEFAULT_REGRESSION_MODEL_OUTPUT_PATH, 'w') as f:
+        with open(DEFAULT_REGRESSION_MODEL_OUTPUT_PATH, 'wb') as f:
             pickle.dump(regr_model, f)
 
 if __name__ == "__main__":
