@@ -23,7 +23,8 @@ import config
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 DEFAULT_PREDICTORS = ['temp_max', 'precipitation'] + ['weekday_' + wd for wd in WEEKDAYS]
-DEFAULT_TARGET = 'visitors_class'
+DEFAULT_CLASSIFICATION_TARGET = 'visitors_class'
+DEFAULT_REGRESSION_TARGET = 'visitors'
 
 TRAINING_DATA_PATH_VISITORS = "data/oldVisitorCounts.csv"
 TRAINING_DATA_PATH_WEATHER = "data/weather_observations_jan-mar_2010-2016.csv"
@@ -33,8 +34,19 @@ logger = logging.getLogger(__name__)
 
 class ModelBuilder(object):
 
-    def __init__(self, app):
+    def __init__(self, app, weather_data, visitor_data):
         self._app = app
+
+        self._preprocess_weather_data(weather_data)
+        self._preprocess_visitor_data(visitor_data)
+        full_data = pd.merge(visitor_data, weather_data, on='datetime')
+
+        # the datetime column is irrelevant as a feature and makes conversion
+        # to a numeric array more difficult, so remove it
+        del full_data['datetime']
+
+        # convert categorical features to binary numerical features
+        self.data = pd.get_dummies(full_data, columns=['weekday'])
 
     def _preprocess_weather_data(self, data):
         # the data contains precipitation values of -1.0 for a lot of days, so
@@ -65,32 +77,20 @@ class ModelBuilder(object):
         visitors_normalized = data.groupby('weekday')['visitors'].transform(lambda x: x / x.mean())
         data['visitors_normalized'] = visitors_normalized
 
-    def build_model(self, visitor_data, weather_data,
-                    predictors=DEFAULT_PREDICTORS,
-                    target=DEFAULT_TARGET):
-
-        self._preprocess_visitor_data(visitor_data)
-        self._preprocess_weather_data(weather_data)
-
-        full_data = pd.merge(visitor_data, weather_data, on='datetime')
-
-        # the datetime column is irrelevant as a feature and makes conversion
-        # to a numeric array more difficult, so remove it
-        del full_data['datetime']
-
-        # convert categorical features to binary numerical features
-        full_data = pd.get_dummies(full_data, columns=['weekday'])
-
-        X = full_data[predictors].as_matrix()
-        y = full_data[target].as_matrix()
+    def build_classifier(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_CLASSIFICATION_TARGET):
+        X = self.data[predictors].as_matrix()
+        y = self.data[target].as_matrix()
 
         #model = linear_model.LinearRegression()
-        model = SVC()
+        classifier = SVC()
 
-        scores = cross_val_score(model, X, y, cv=10)
+        scores = cross_val_score(classifier, X, y, cv=10)
 
-        model.fit(X, y)
-        return model, scores
+        classifier.fit(X, y)
+        return classifier, scores
+
+    def build_regression_model(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_REGRESSION_TARGET):
+        pass
 
 
 def main():
@@ -102,11 +102,11 @@ def main():
     visitor_data = pd.read_csv(TRAINING_DATA_PATH_VISITORS)
     weather_data = pd.read_csv(TRAINING_DATA_PATH_WEATHER)
 
-    builder = ModelBuilder(app)
-    model, scores = builder.build_model(visitor_data, weather_data)
-    print("Cross-validation scores:")
-    print(scores)
-    print("Mean score: {v}".format(v=np.mean(scores)))
+    builder = ModelBuilder(app, weather_data, visitor_data)
+    classifier, classification_scores = builder.build_classifier()
+    print("Cross-validation accuracies for classification:")
+    print(classification_scores)
+    print("Mean accuracy: {v}".format(v=np.mean(classification_scores)))
 
 
 if __name__ == "__main__":
