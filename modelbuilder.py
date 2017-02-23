@@ -16,6 +16,7 @@ import pickle
 import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn import linear_model
+from sklearn.metrics import mean_squared_error, make_scorer
 from sklearn.svm import SVC, LinearSVC, SVR, LinearSVR
 import numpy as np
 from flask import Flask
@@ -89,9 +90,10 @@ class ModelBuilder(object):
 
         classifier = SVC()
 
+        # produce accuracy estimate through cross-validation
         scores = cross_val_score(classifier, X, y, cv=10)
-
         classifier.fit(X, y)
+
         return classifier, scores
 
     def build_regression_model(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_REGRESSION_TARGET):
@@ -99,8 +101,11 @@ class ModelBuilder(object):
         y = self.data[target].as_matrix()
 
         model = linear_model.LinearRegression()
+
+        # produce accuracy estimate through cross-validation
+        scores = cross_val_score(model, X, y, cv=10, scoring=make_scorer(mean_squared_error))
         model.fit(X, y)
-        return model
+        return model, scores
 
 
 def _get_arg_parser():
@@ -130,11 +135,16 @@ def main():
 
     builder = ModelBuilder(app, weather_data, visitor_data)
     classifier, classification_scores = builder.build_classifier()
-    regr_model = builder.build_regression_model()
+    regr_model, regression_scores = builder.build_regression_model()
 
     print("Cross-validation accuracies for classification:")
     print(classification_scores)
     print("Mean accuracy: {v}".format(v=np.mean(classification_scores)))
+    print("")
+    print("Cross-validation MSEs for regression:")
+    print(regression_scores)
+    print("Mean MSE: {v}".format(v=np.mean(regression_scores)))
+    print("")
 
     if args.store_in_database:
         with app.app_context():
