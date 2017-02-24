@@ -1,10 +1,14 @@
 .idea
 *.pyc
+tmp
 
 # SQLite database files
 *.db
 
-# local virtualenv
-virtualenv
+# local virtualenvs
+virtualenv*
+
+# R metadata (R is used only for offline analysis)
+data/.R*
 
 fmi_api_key.txt
