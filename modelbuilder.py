@@ -26,7 +26,9 @@ import models
 
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-DEFAULT_PREDICTORS = ['temp_max', 'precipitation'] + ['weekday_' + wd for wd in WEEKDAYS]
+PREDICTORS_WEEKDAYS = ['weekday_' + wd for wd in WEEKDAYS]
+PREDICTORS_WEATHER = ['temp_max', 'precipitation']
+DEFAULT_PREDICTORS = PREDICTORS_WEATHER + PREDICTORS_WEEKDAYS
 DEFAULT_CLASSIFICATION_TARGET = 'visitors_class'
 DEFAULT_REGRESSION_TARGET = 'visitors'
 
@@ -64,21 +66,19 @@ class ModelBuilder(object):
         # add visitor count classes to the data frame
         visitor_classes_config = self._app.config['VISITOR_CLASSES']
 
-        classes = collections.OrderedDict(sorted(visitor_classes_config.items(),
-                                          key=lambda class_dict: class_dict[1]['min']))
-
-        logging.debug("Classes config after sorting: {c}".format(c=classes))
+        classes_by_rank = collections.OrderedDict(sorted(visitor_classes_config.items(),
+                                                  key=lambda class_dict: class_dict[1]['min']))
 
         # use numeric indexes as class labels (easier with scikit-learn)
-        class_labels = [i for i, c in enumerate(classes)]
-        class_lower_thresholds = [c['min'] for c in classes.values()]
+        class_labels = [i for i, c in enumerate(classes_by_rank)]
+        class_lower_thresholds = [c['min'] for c in classes_by_rank.values()]
 
         # pd.cut seems to want a max value for the last bin too, so add infinity as max
         class_lower_thresholds.append(float('inf'))
 
-        visitor_classes = pd.cut(data['visitors'], class_lower_thresholds,
-                                 labels=class_labels, include_lowest=True)
-        data['visitors_class'] = visitor_classes
+        classification = pd.cut(data['visitors'], class_lower_thresholds,
+                                labels=class_labels, include_lowest=True)
+        data['visitors_class'] = classification
 
         # add visitor counts normalized by weekday
         visitors_normalized = data.groupby('weekday')['visitors'].transform(lambda x: x / x.mean())
