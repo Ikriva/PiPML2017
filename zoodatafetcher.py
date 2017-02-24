@@ -1,5 +1,6 @@
+#!/usr/bin/env python
+
 # Zoo Data harvester and extractor for external data sources in ZooPredict
-# Project in Practical Machine Learning, University of Helsinki, 2017
 #
 # This is run periodically once a day from command line.
 
@@ -72,7 +73,6 @@ def _visitor_class_resolver(count):
 
 
 def main():
-    """Initializes the database with configuration from the main config file."""
     logging.config.dictConfig(config.LOGGING_CONF)
 
     app = Flask(__name__)

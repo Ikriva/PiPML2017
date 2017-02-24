@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-# Database initialization utility for ZooPredict
-# Project in Practical Machine Learning, 2017, University of Helsinki
+# Database initialization utility for ZooPredict.
+# Populates the database based on the application-wide configuration
+# and persistence models.
 
 from __future__ import print_function
 
@@ -23,7 +24,6 @@ def initdb(app):
 
 
 def main():
-    """Initializes the database with configuration from the main config file."""
     app = Flask(__name__)
     app.config.from_object("config")
     initdb(app)

@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 # A command-line utility that loads weather data and zoo visitor data from CSV
-# files and learns a scikit-learn model from the data.
-# Written for the Project in Practical Machine Learning course, 2017,
-# University of Helsinki
+# files and trains scikit-learn classification and regression models based on
+# the data.
 
 from __future__ import print_function
 
