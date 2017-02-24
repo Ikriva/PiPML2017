@@ -13,7 +13,7 @@ import os
 from flask import Flask
 
 import config
-import datafetcher
+import fmi_datafetcher
 import models
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ def harvest(app):
     date = today + offset
 
     logger.info("Fetching FMI weather forecast data for {d}".format(d=str(date)))
-    observations = datafetcher.get_daily_fmi_weather_forecast(location, date, date, fmi_api_key)
+    observations = fmi_datafetcher.get_daily_fmi_weather_forecast(location, date, date, fmi_api_key)
 
     with app.app_context():
         for obs in observations:

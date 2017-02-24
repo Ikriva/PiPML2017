@@ -1,6 +1,4 @@
-# Project in Practical Machine Learning, University of Helsinki, 2017
-#
-# Parsers for input data formats.
+# Parsers for input data formats in ZooPredict.
 #
 # Author: Mika Wahlroos
 

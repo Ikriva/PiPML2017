@@ -4,7 +4,7 @@
 #
 # Author: Mika Wahlroos
 
-import parsers
+import fmi_parser
 import requests
 import csv
 import datetime
@@ -47,7 +47,7 @@ def get_daily_fmi_weather_forecast(location, start_date, end_date, api_key):
     if len(resp.text) == 0:
         raise IOError("Got empty response to data request")
 
-    parser = parsers.FMIWeatherForecastParser()
+    parser = fmi_parser.FMIWeatherForecastParser()
     parser.parse(resp.text, location)
     return parser.get_forecasts()
 
@@ -73,7 +73,7 @@ def get_daily_fmi_weather_observations(location, start_date, end_date, api_key):
     if len(resp.text) == 0:
         raise IOError("Got empty response to data request")
 
-    parser = parsers.FMIWeatherObservationParser()
+    parser = fmi_parser.FMIWeatherObservationParser()
     parser.parse(resp.text)
     return parser.get_observations()
 
