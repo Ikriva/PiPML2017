@@ -111,6 +111,8 @@ def _get_arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--store-in-database', dest='store_in_database', action='store_true',
                         help='store the generated models in the database instead of files')
+    parser.add_argument('-k', '--keep-existing', dest='keep_existing', action='store_true', default=False,
+                        help='keep existing models in the database; by default they are dropped')
     parser.add_argument('-w', '--weather-data-path', dest='weather_data_path',
                         default=DEFAULT_WEATHER_TRAINING_DATA_PATH,
                         help='path the weather data CSV file')
@@ -149,8 +151,14 @@ def main():
         with app.app_context():
             db = models.db
             db.init_app(app)
-            db.session.add(models.PredictionModel(classifier, True))
-            db.session.add(models.PredictionModel(regr_model, False))
+
+            if not args.keep_existing:
+                existing = models.PredictionModel.query.all()
+                for model in existing:
+                    db.session.delete(model)
+
+            db.session.add(models.PredictionModel(classifier, True, type(classifier).__name__))
+            db.session.add(models.PredictionModel(regr_model, False, type(regr_model).__name__))
             db.session.commit()
     else:
         print("Writing classifier serialization into {p}".format(p=DEFAULT_CLASSIFIER_OUTPUT_PATH))
