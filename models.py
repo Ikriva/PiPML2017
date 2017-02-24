@@ -63,8 +63,9 @@ class PredictionModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     model = db.Column(db.PickleType, nullable=False)
     is_classifier = db.Column(db.Boolean, nullable=False)
+    name = db.Column(db.String)
 
-    def __init__(self, model, is_classifier):
+    def __init__(self, model, is_classifier, name=None):
         """
         Initializes a new prediction model persistence instance.
         :param model: the prediction model object
@@ -72,3 +73,4 @@ class PredictionModel(db.Model):
         """
         self.model = model
         self.is_classifier = is_classifier
+        self.name = name
