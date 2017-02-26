@@ -72,22 +72,30 @@ class ZooStatisticPrediction(ZooStatistic):
 
 class PredictionModel(db.Model):
     """
-    Persistence model for prediction models.
+    Base class for persistence models of prediction models.
 
     The models may be arbitrary objects and are persisted as pickled blobs.
     """
+    __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
     model = db.Column(db.PickleType, nullable=False)
-    is_classifier = db.Column(db.Boolean, nullable=False)
     name = db.Column(db.String)
 
-    def __init__(self, model, is_classifier, name=None):
+    def __init__(self, model, name=None):
         """
         Initializes a new prediction model persistence instance.
         :param model: the prediction model object
-        :param is_classifier: should be True for classification models, False for regression
         """
         self.model = model
-        self.is_classifier = is_classifier
         self.name = name
+
+
+class RegressionModel(PredictionModel):
+
+    __tablename__ = "regression_model"
+
+
+class Classifier(PredictionModel):
+
+    __tablename__ = 'classifier'

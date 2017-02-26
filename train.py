@@ -153,12 +153,12 @@ def main():
             db.init_app(app)
 
             if not args.keep_existing:
-                existing = models.PredictionModel.query.all()
+                existing = models.Classifier.query.all() + models.RegressionModel.query.all()
                 for model in existing:
                     db.session.delete(model)
 
-            db.session.add(models.PredictionModel(classifier, True, type(classifier).__name__))
-            db.session.add(models.PredictionModel(regr_model, False, type(regr_model).__name__))
+            db.session.add(models.Classifier(classifier, type(classifier).__name__))
+            db.session.add(models.RegressionModel(regr_model, type(regr_model).__name__))
             db.session.commit()
     else:
         print("Writing classifier serialization into {p}".format(p=DEFAULT_CLASSIFIER_OUTPUT_PATH))
