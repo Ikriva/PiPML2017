@@ -39,8 +39,9 @@ class WeatherObservation(db.Model):
 
 class ZooStatistic(db.Model):
     """
-    Persistence model for zoo visitor statistics for a single day.
+    Base class for zoo visitor statistic persistence models.
     """
+    __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
@@ -51,6 +52,22 @@ class ZooStatistic(db.Model):
         self.date = date
         self.visitors = visitors
         self.visitors_class = visitors_class
+
+
+class ZooStatisticActual(ZooStatistic):
+    """
+    Persistence model for zoo visitor statistics for a single day.
+    """
+
+    __tablename__ = 'zoo_statistic'
+
+
+class ZooStatisticPrediction(ZooStatistic):
+    """
+    Persistence model for zoo visitor statistic predictoins for a single day.
+    """
+
+    __tablename__ = 'zoo_statistic_prediction'
 
 
 class PredictionModel(db.Model):

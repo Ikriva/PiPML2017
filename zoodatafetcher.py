@@ -52,7 +52,7 @@ def _read_daylist_from_month_statistic(worksheet, dates):
         # Assumption is that values are continuous until the day count is empty for future days
         if value is None:
             break
-        result.append(models.ZooStatistic(day, value, _visitor_class_resolver(value)))
+        result.append(models.ZooStatisticActual(day, value, _visitor_class_resolver(value)))
     return result
 
 
