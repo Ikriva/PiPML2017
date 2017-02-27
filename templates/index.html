@@ -1,15 +1,30 @@
 {% extends "layout.html" %}
 {% block title %}
-    <title>{{ _("Hello, World!") }}</title>
+    <title>{{ _("ZooPredict!") }}</title>
 {% endblock title %}
 
 {% block body %}
-    <h1>{{ _("Hello, World!") }}</h1>
+    <h1>{{ _("Predicted visitor numbers for Helsinki Zoo") }}</h1>
 
     {% if error %}
         <div class="errors">
             <p class="error">{{ error }}</p>
         </div>
     {% endif %}
+
+    <table>
+        <tr>
+            <td>Date:</td>
+            <td>Predicted visitors:</td>
+            <td>Predicted visitor class:</td>
+        </tr>
+        {% for prediction in predictions %}
+            <tr>
+                <td>{{prediction.date}}</td>
+                <td>{{prediction.visitors}}</td>
+                <td>{{prediction.visitors_class}}</td>
+            </tr>
+        {% endfor %}
+    </table>
 
 {% endblock body %}
