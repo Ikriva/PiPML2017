@@ -8,20 +8,20 @@
 
     {% if error %}
         <div class="errors">
-            <p class="error">{{ error }}</p>
+            <p class="error">{{ _(error) }}</p>
         </div>
     {% endif %}
 
-    <table>
+    <table id="predictions" class="predictions">
         <tr>
-            <td>Date:</td>
-            <td>Predicted visitors:</td>
-            <td>Predicted visitor class:</td>
+            <td>{{ _('Date') }}</td>
+            <td>{{ _('Predicted visitors') }}</td>
+            <td>{{ _('Predicted visitor class') }}</td>
         </tr>
         {% for prediction in predictions %}
             <tr>
                 <td>{{prediction.date}}</td>
-                <td>{{prediction.visitors}}</td>
+                <td>{{prediction.visitors|round(0)|int}}</td>
                 <td>{{prediction.visitors_class}}</td>
             </tr>
         {% endfor %}
