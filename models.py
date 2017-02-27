@@ -90,6 +90,16 @@ class ZooStatisticPrediction(ZooStatistic):
 
     __tablename__ = 'zoo_statistic_prediction'
 
+    classifier_id = db.Column(db.Integer, db.ForeignKey('classifier.id'))
+    regression_model_id = db.Column(db.Integer, db.ForeignKey('regression_model.id'))
+    classifier = db.relationship('Classifier', foreign_keys=classifier_id)
+    regression_model = db.relationship('RegressionModel', foreign_keys=regression_model_id)
+
+    def __init__(self, date, visitors, visitors_class, regression_model=None, classifier=None):
+        super(ZooStatisticPrediction, self).__init__(date, visitors, visitors_class)
+        self.regression_model = regression_model
+        self.classifier = classifier
+
 
 class PredictionModel(db.Model):
     """

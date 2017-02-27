@@ -57,7 +57,11 @@ class FMIHarvester(object):
                 predicted_class = classifier.model.predict(predictors)[0].item()
                 predicted_visitors = regression_model.model.predict(predictors)[0].item()
 
-                prediction = models.ZooStatisticPrediction(forecast.date, predicted_visitors, predicted_class)
+                prediction = models.ZooStatisticPrediction(forecast.date,
+                                                           predicted_visitors,
+                                                           predicted_class,
+                                                           regression_model,
+                                                           classifier)
 
                 db.session.add(prediction)
 
