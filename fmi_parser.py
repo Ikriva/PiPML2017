@@ -79,7 +79,7 @@ class FMIWeatherForecastParser(object):
                 daily_forecast = self.forecasts.get(date, None)
                 if daily_forecast is None:
                     logger.debug("Found forecast for new data: {d}".format(d=str(date)))
-                    daily_forecast = models.WeatherObservation(date, temp_max=-inf, temp_min=inf, precipitation=0.0)
+                    daily_forecast = models.WeatherForecast(date, temp_max=-inf, temp_min=inf, precipitation=0.0)
                 if date not in hourly_temperatures.keys():
                     hourly_temperatures[date] = []
 

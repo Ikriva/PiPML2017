@@ -12,20 +12,18 @@ import logging
 import logging.config
 import pickle
 
+import numpy as np
 import pandas as pd
-from sklearn.model_selection import cross_val_score
+from flask import Flask
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, make_scorer
-from sklearn.svm import SVC, LinearSVC, SVR, LinearSVR
-import numpy as np
-from flask import Flask
+from sklearn.model_selection import cross_val_score
+from sklearn.svm import SVC
 
 import config
 import models
 
-WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
-PREDICTORS_WEEKDAYS = ['weekday_' + wd for wd in WEEKDAYS]
+PREDICTORS_WEEKDAYS = ['weekday_' + wd for wd in config.WEEKDAYS]
 PREDICTORS_WEATHER = ['temp_max', 'precipitation']
 DEFAULT_PREDICTORS = PREDICTORS_WEATHER + PREDICTORS_WEEKDAYS
 DEFAULT_CLASSIFICATION_TARGET = 'visitors_class'
@@ -105,6 +103,32 @@ class ModelBuilder(object):
         scores = cross_val_score(model, X, y, cv=10, scoring=make_scorer(mean_squared_error))
         model.fit(X, y)
         return model, scores
+
+
+def weather_to_predictors(daily_weather_data, predictors=DEFAULT_PREDICTORS):
+    """
+    Takes a list of weather forecasts or observations and returns a feature
+    vector ready for passing to a classifier or regression model built by
+    ModelBuilder.
+    @param daily_weather_data: the daily weather data point
+    @return: a prediction model feature vector
+    """
+
+    weekdays = [config.WEEKDAYS[w.date.weekday()] for w in daily_weather_data]
+
+    dicts = [w.as_dict() for w in daily_weather_data]
+
+    # construct a data frame and add weekday (not explicitly included in weather data)
+    dataframe = pd.DataFrame.from_dict(dicts)
+    dataframe['weekday'] = weekdays
+
+    # turn the weekday variable into one-hot predictors
+    dataframe = pd.get_dummies(dataframe, columns=['weekday'])
+
+    # fill in columns for the weekday values that didn't appear in the weather observation
+    dataframe = dataframe.reindex(columns=predictors).fillna(0, downcast='infer')
+
+    return dataframe[predictors]
 
 
 def _get_arg_parser():

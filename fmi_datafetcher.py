@@ -4,12 +4,14 @@
 #
 # Author: Mika Wahlroos
 
-import fmi_parser
-import requests
 import csv
 import datetime
 import logging
 
+import requests
+
+import fmi_parser
+import models
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +82,7 @@ def get_daily_fmi_weather_observations(location, start_date, end_date, api_key):
 
 def write_weather_observations(observations, outstream):
     obs_sorted = sorted(observations, key=lambda o: o.date)
-    obs_dicts = [_weather_observation_to_dict(o) for o in obs_sorted]
+    obs_dicts = [o.as_dict() for o in obs_sorted]
 
     fieldnames = ['date', 'precipitation', 'temp_mean', 'temp_min', 'temp_max']
     writer = csv.DictWriter(outstream, fieldnames=fieldnames)
@@ -104,11 +106,3 @@ def get_weather_observation_history(apikey, output_path):
         write_weather_observations(all_obs, f)
 
 
-def _weather_observation_to_dict(observation):
-    return {
-        'date': observation.date,
-        'precipitation': observation.precipitation,
-        'temp_mean': observation.temp_mean,
-        'temp_min': observation.temp_min,
-        'temp_max': observation.temp_max
-    }

@@ -6,10 +6,12 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-class WeatherObservation(db.Model):
+class DailyWeather(db.Model):
     """
-    Persistence model for daily weather observations.
+    Persistence model for daily weather observations and forecasts.
     """
+
+    __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
@@ -35,6 +37,25 @@ class WeatherObservation(db.Model):
 
     def __str__(self):
         return repr(self)
+
+    def as_dict(self):
+        return {
+            'date': self.date,
+            'precipitation': self.precipitation,
+            'temp_mean': self.temp_mean,
+            'temp_min': self.temp_min,
+            'temp_max': self.temp_max
+        }
+
+
+class WeatherObservation(DailyWeather):
+
+    __tablename__ = "weather_observation"
+
+
+class WeatherForecast(DailyWeather):
+
+    __tablename__ = "weather_forecast"
 
 
 class ZooStatistic(db.Model):

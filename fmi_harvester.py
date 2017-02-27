@@ -15,32 +15,53 @@ from flask import Flask
 import config
 import fmi_datafetcher
 import models
+import train
 
 logger = logging.getLogger(__name__)
 
 
-def harvest(app):
-    logger.info("Running data harvester")
-    db = models.db
-    db.init_app(app)
+class FMIHarvester(object):
 
-    fmi_api_key = _get_fmi_api_key(app.config['FMI_API_KEY_PATH'])
-    location = app.config['FMI_WEATHER_LOCATION']
+    def __init__(self, app):
+        self._app = app
 
-    # retrieve FMI weather forecast for the next day
-    offset = datetime.timedelta(days=1)
-    today = datetime.datetime.now().date()
+    def harvest(self):
+        logger.info("Running data harvester")
+        db = models.db
 
-    date = today + offset
+        fmi_api_key = _get_fmi_api_key(self._app.config['FMI_API_KEY_PATH'])
+        location = self._app.config['FMI_WEATHER_LOCATION']
 
-    logger.info("Fetching FMI weather forecast data for {d}".format(d=str(date)))
-    observations = fmi_datafetcher.get_daily_fmi_weather_forecast(location, date, date, fmi_api_key)
+        # retrieve FMI weather forecast for the next day
+        offset = datetime.timedelta(days=1)
+        today = datetime.datetime.now().date()
 
-    with app.app_context():
-        for obs in observations:
-            logger.debug("Got observation: {o}".format(o=str(obs)))
-            db.session.add(obs)
-        db.session.commit()
+        date = today + offset
+
+        logger.info("Fetching FMI weather forecast data for {d}".format(d=str(date)))
+        forecasts = fmi_datafetcher.get_daily_fmi_weather_forecast(location, date, date, fmi_api_key)
+
+        with self._app.app_context():
+            classifier = models.Classifier.query.first()
+            regression_model = models.RegressionModel.query.first()
+
+            logging.debug("Using classifier: {c}".format(c=classifier.name))
+            logging.debug("Using regression model: {r}".format(r=regression_model.name))
+
+            for forecast in forecasts:
+                logger.debug("Got forecast: {f}".format(f=str(forecast)))
+                db.session.add(forecast)
+
+                predictors = train.weather_to_predictors([forecast])
+
+                predicted_class = classifier.model.predict(predictors)[0].item()
+                predicted_visitors = regression_model.model.predict(predictors)[0].item()
+
+                prediction = models.ZooStatisticPrediction(forecast.date, predicted_visitors, predicted_class)
+
+                db.session.add(prediction)
+
+            db.session.commit()
 
 
 def _get_fmi_api_key(api_key_path):
@@ -57,12 +78,14 @@ def _get_fmi_api_key(api_key_path):
 
 
 def main():
-    """Initializes the database with configuration from the main config file."""
     logging.config.dictConfig(config.LOGGING_CONF)
 
     app = Flask(__name__)
     app.config.from_object("config")
-    harvest(app)
+    models.db.init_app(app)
+
+    harvester = FMIHarvester(app)
+    harvester.harvest()
 
 if __name__ == "__main__":
     main()

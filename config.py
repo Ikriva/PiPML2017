@@ -55,3 +55,4 @@ LOGGING_CONF = {
         }
     }
 }
+WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
