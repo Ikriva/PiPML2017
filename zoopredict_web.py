@@ -26,7 +26,14 @@ models.db.init_app(app)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    with app.app_context():
+        predictions =\
+            models.ZooStatisticPrediction.query\
+                  .order_by(models.ZooStatisticPrediction.date.desc())\
+                  .limit(5).all()
+    logger.debug("Predictions: {p}".format(p=str(predictions)))
+
+    return render_template("index.html", predictions=predictions)
 
 
 if __name__ == "__main__":
