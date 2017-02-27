@@ -1,6 +1,6 @@
 # Project in Practical Machine Learning, University of Helsinki, 2017
 #
-# A module for fetching data from external sources.
+# A module for fetching data from FMI.
 #
 # Author: Mika Wahlroos
 
@@ -11,7 +11,6 @@ import logging
 import requests
 
 import fmi_parser
-import models
 
 logger = logging.getLogger(__name__)
 
