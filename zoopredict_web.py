@@ -31,9 +31,19 @@ def index():
             models.ZooStatisticPrediction.query\
                   .order_by(models.ZooStatisticPrediction.date.desc())\
                   .limit(5).all()
-    logger.debug("Predictions: {p}".format(p=str(predictions)))
+        logger.debug("Predictions: {p}".format(p=str(predictions)))
 
-    return render_template("index.html", predictions=predictions)
+        predictions_and_actuals = list()
+        for prediction in predictions:
+            d = {'prediction': prediction}
+            actual =\
+                models.ZooStatisticActual.query\
+                      .filter(models.ZooStatisticActual.date == prediction.date)\
+                      .first()
+            d['actual'] = actual if actual else None
+            predictions_and_actuals.append(d)
+
+    return render_template("index.html", predictions=predictions_and_actuals)
 
 
 if __name__ == "__main__":

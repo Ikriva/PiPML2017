@@ -16,13 +16,25 @@
         <tr>
             <td>{{ _('Date') }}</td>
             <td>{{ _('Predicted visitors') }}</td>
+            <td>{{ _('Actual visitors') }}</td>
             <td>{{ _('Predicted visitor class') }}</td>
+            <td>{{ _('Actual visitors class') }}</td>
         </tr>
         {% for prediction in predictions %}
             <tr>
-                <td>{{prediction.date}}</td>
-                <td>{{prediction.visitors|round(0)|int}}</td>
-                <td>{{prediction.visitors_class}}</td>
+                <td>{{prediction['prediction'].date}}</td>
+                <td>{{prediction['prediction'].visitors|round(0)|int}}</td>
+                {% if prediction['actual'] is not none %}
+                    <td>{{prediction['actual'].visitors|round(0)|int}}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+                <td>{{prediction['prediction'].visitors_class}}</td>
+                {% if prediction['actual'] is not none %}
+                    <td>{{prediction['actual'].visitors_class}}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>
