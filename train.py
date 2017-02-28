@@ -85,7 +85,7 @@ class ModelBuilder(object):
         X = self.data[predictors].as_matrix()
         y = self.data[target].as_matrix()
 
-        classifier = SVC()
+        classifier = SVC(C=1, kernel='linear')
 
         # produce accuracy estimate through cross-validation
         scores = cross_val_score(classifier, X, y, cv=10)
