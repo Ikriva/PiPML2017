@@ -27,23 +27,11 @@ models.db.init_app(app)
 @app.route("/")
 def index():
     with app.app_context():
-        predictions =\
-            models.ZooStatisticPrediction.query\
-                  .order_by(models.ZooStatisticPrediction.date.desc())\
-                  .limit(5).all()
-        logger.debug("Predictions: {p}".format(p=str(predictions)))
+        results = models.get_zoo_predictions_and_actuals()
 
-        predictions_and_actuals = list()
-        for prediction in predictions:
-            d = {'prediction': prediction}
-            actual =\
-                models.ZooStatisticActual.query\
-                      .filter(models.ZooStatisticActual.date == prediction.date)\
-                      .first()
-            d['actual'] = actual if actual else None
-            predictions_and_actuals.append(d)
+    daily_predictions = [{'prediction': row[0], 'actual': row[1]} for row in results]
 
-    return render_template("index.html", predictions=predictions_and_actuals)
+    return render_template("index.html", predictions=daily_predictions[:5])
 
 
 if __name__ == "__main__":

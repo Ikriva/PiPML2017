@@ -130,3 +130,16 @@ class RegressionModel(PredictionModel):
 class Classifier(PredictionModel):
 
     __tablename__ = 'classifier'
+
+
+def get_zoo_predictions_and_actuals():
+    """
+    Returns a list of all visitor statistic predictions and actual values.
+    @return: list of (ZooStatisticPrediction, ZooStatisticActual) tuples
+    """
+    results = db.session.query(ZooStatisticPrediction, ZooStatisticActual)\
+                        .join(ZooStatisticActual,
+                              ZooStatisticPrediction.date == ZooStatisticActual.date)\
+                        .order_by(ZooStatisticPrediction.date.desc())\
+                        .all()
+    return results
