@@ -81,26 +81,32 @@ class ModelBuilder(object):
         visitors_normalized = data.groupby('weekday')['visitors'].transform(lambda x: x / x.mean())
         data['visitors_normalized'] = visitors_normalized
 
-    def build_classifier(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_CLASSIFICATION_TARGET):
+    def build_classifier(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_CLASSIFICATION_TARGET, cv=10):
         X = self.data[predictors].as_matrix()
         y = self.data[target].as_matrix()
 
         classifier = SVC(C=1, kernel='linear')
 
         # produce accuracy estimate through cross-validation
-        scores = cross_val_score(classifier, X, y, cv=10)
+        if cv:
+            scores = cross_val_score(classifier, X, y, cv=cv)
+        else:
+            scores = None
         classifier.fit(X, y)
 
         return classifier, scores
 
-    def build_regression_model(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_REGRESSION_TARGET):
+    def build_regression_model(self, predictors=DEFAULT_PREDICTORS, target=DEFAULT_REGRESSION_TARGET, cv=10):
         X = self.data[predictors].as_matrix()
         y = self.data[target].as_matrix()
 
         model = linear_model.LinearRegression()
 
         # produce accuracy estimate through cross-validation
-        scores = cross_val_score(model, X, y, cv=10, scoring=make_scorer(mean_squared_error))
+        if cv:
+            scores = cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_squared_error))
+        else:
+            scores = None
         model.fit(X, y)
         return model, scores
 

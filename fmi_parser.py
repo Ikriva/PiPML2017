@@ -51,7 +51,7 @@ class FMIWeatherObservationParser(object):
         return self.observations[date]
 
     def get_observations(self):
-        return self.observations.values()
+        return list(self.observations.values())
 
 
 class FMIWeatherForecastParser(object):
@@ -105,7 +105,7 @@ class FMIWeatherForecastParser(object):
         return self.forecasts[date]
 
     def get_forecasts(self):
-        return self.forecasts.values()
+        return list(self.forecasts.values())
 
 
 def parse_fmi_date(date_string):
