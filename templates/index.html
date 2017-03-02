@@ -29,9 +29,9 @@
                 {% else %}
                     <td></td>
                 {% endif %}
-                <td>{{prediction['prediction'].visitors_class | visitors_class_label}}</td>
+                <td>{{prediction['prediction'].visitors_class | visitors_class_to_label}}</td>
                 {% if prediction['actual'] is not none %}
-                    <td>{{prediction['actual'].visitors_class | visitors_class_label}}</td>
+                    <td>{{prediction['actual'].visitors_class | visitors_class_to_label}}</td>
                 {% else %}
                     <td></td>
                 {% endif %}
