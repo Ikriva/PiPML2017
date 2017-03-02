@@ -23,15 +23,15 @@
         {% for prediction in predictions %}
             <tr>
                 <td>{{prediction['prediction'].date}}</td>
-                <td>{{prediction['prediction'].visitors|round(0)|int}}</td>
+                <td>{{prediction['prediction'].visitors|round()|int}}</td>
                 {% if prediction['actual'] is not none %}
-                    <td>{{prediction['actual'].visitors|round(0)|int}}</td>
+                    <td>{{prediction['actual'].visitors|round()|int}}</td>
                 {% else %}
                     <td></td>
                 {% endif %}
-                <td>{{prediction['prediction'].visitors_class}}</td>
+                <td>{{prediction['prediction'].visitors_class | visitors_class_label}}</td>
                 {% if prediction['actual'] is not none %}
-                    <td>{{prediction['actual'].visitors_class}}</td>
+                    <td>{{prediction['actual'].visitors_class | visitors_class_label}}</td>
                 {% else %}
                     <td></td>
                 {% endif %}

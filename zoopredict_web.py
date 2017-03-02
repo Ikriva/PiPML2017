@@ -30,8 +30,12 @@ def index():
         results = models.get_zoo_predictions_and_actuals()
 
     daily_predictions = [{'prediction': row[0], 'actual': row[1]} for row in results]
-
     return render_template("index.html", predictions=daily_predictions[:5])
+
+
+@app.template_filter('visitors_class_to_label')
+def visitors_class_to_label(i):
+    return app.config['VISITOR_CLASSES'][i]['label']
 
 
 if __name__ == "__main__":
