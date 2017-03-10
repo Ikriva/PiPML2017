@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from flask import Flask
 from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, make_scorer
+from sklearn.metrics import mean_squared_error, mean_absolute_error, make_scorer
 from sklearn.model_selection import cross_val_score
 from sklearn.svm import SVC
 
@@ -66,11 +66,12 @@ class ModelBuilder(object):
         classes_by_rank = collections.OrderedDict(sorted(visitor_classes_config.items(),
                                                   key=lambda class_dict: class_dict[1]['min']))
 
-        # use numeric indexes as class labels (easier with scikit-learn)
+        # use numeric indexes as class labels (makes things easier with scikit-learn)
         class_labels = [i for i, c in enumerate(classes_by_rank)]
         class_lower_thresholds = [c['min'] for c in classes_by_rank.values()]
 
-        # pd.cut seems to want a max value for the last bin too, so add infinity as max
+        # Split the data into bins based on the class theresholds.
+        # pd.cut seems to want a max value for the last bin too, so add infinity as max.
         class_lower_thresholds.append(float('inf'))
 
         classification = pd.cut(data['visitors'], class_lower_thresholds,
@@ -104,7 +105,10 @@ class ModelBuilder(object):
 
         # produce accuracy estimate through cross-validation
         if cv:
-            scores = cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_squared_error))
+            scores = {
+                'mae': cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_absolute_error)),
+                'mse': cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_squared_error))
+            }
         else:
             scores = None
         model.fit(X, y)
@@ -149,6 +153,8 @@ def _get_arg_parser():
     parser.add_argument('-v', '--visitor-data-path', dest='visitor_data_path',
                         default=DEFAULT_VISITORS_TRAINING_DATA_PATH,
                         help='path to the visitor data CSV file')
+    parser.add_argument('-V', '--verbose', dest='verbose', action='store_true',
+                        help='more verbose output')
     return parser
 
 
@@ -168,13 +174,17 @@ def main():
     classifier, classification_scores = builder.build_classifier()
     regr_model, regression_scores = builder.build_regression_model()
 
-    print("Cross-validation accuracies for classification:")
-    print(classification_scores)
-    print("Mean accuracy: {v}".format(v=np.mean(classification_scores)))
+    if args.verbose:
+        print("Cross-validation accuracies for classification:")
+        print(classification_scores)
+    print("Mean accuracy (classification): {v}".format(v=np.mean(classification_scores)))
     print("")
-    print("Cross-validation MSEs for regression:")
-    print(regression_scores)
-    print("Mean MSE: {v}".format(v=np.mean(regression_scores)))
+
+    if args.verbose:
+        print("Cross-validation MAEs for regression:")
+        print(regression_scores)
+    print("Mean MSE (regression): {v}".format(v=np.mean(regression_scores['mse'])))
+    print("Mean MAE (regression): {v}".format(v=np.mean(regression_scores['mae'])))
     print("")
 
     if args.store_in_database:
