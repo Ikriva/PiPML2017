@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from flask import Flask
 from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, mean_absolute_error, make_scorer
+from sklearn.metrics import mean_squared_error, mean_absolute_error, median_absolute_error, make_scorer
 from sklearn.model_selection import cross_val_score
 from sklearn.svm import SVC
 
@@ -106,8 +106,12 @@ class ModelBuilder(object):
         # produce accuracy estimate through cross-validation
         if cv:
             scores = {
-                'mae': cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_absolute_error)),
-                'mse': cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_squared_error))
+                'mean_absolute_error':
+                    cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_absolute_error)),
+                'mean_squared_error':
+                    cross_val_score(model, X, y, cv=cv, scoring=make_scorer(mean_squared_error)),
+                'median_absolute_error':
+                    cross_val_score(model, X, y, cv=cv, scoring=make_scorer(median_absolute_error)),
             }
         else:
             scores = None
@@ -183,8 +187,9 @@ def main():
     if args.verbose:
         print("Cross-validation MAEs for regression:")
         print(regression_scores)
-    print("Mean MSE (regression): {v}".format(v=np.mean(regression_scores['mse'])))
-    print("Mean MAE (regression): {v}".format(v=np.mean(regression_scores['mae'])))
+    print("Mean MSE (regression): {v}".format(v=np.mean(regression_scores['mean_squared_error'])))
+    print("Mean MAE (regression): {v}".format(v=np.mean(regression_scores['mean_absolute_error'])))
+    print("Mean median absolute error (regression): {v}".format(v=np.mean(regression_scores['median_absolute_error'])))
     print("")
 
     if args.store_in_database:
