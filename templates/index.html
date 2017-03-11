@@ -12,40 +12,61 @@
         </div>
     {% endif %}
 
-    <table id="predictions" class="predictions">
-        <tr>
-            <td>{{ _('Date') }}</td>
-            <td>{{ _('Predicted visitors') }}</td>
-            <td>{{ _('Actual visitors') }}</td>
-            <td>{{ _('Difference') }}</td>
-            <td>{{ _('Predicted visitor class') }}</td>
-            <td>{{ _('Actual visitors class') }}</td>
-            <td>{{ _('Difference') }}</td>
-        </tr>
-        {% for row in predictions %}
+    <div>
+        <h2>{{ _('Performance measurements') }}</h2>
+        <ul id="performance_measurements" class="performance_measurements">
+            <li class="performance_measurement">
+                {{ _('Mean squared error') }}: {{ mean_squared_error | round | int }}
+            </li>
+            <li class="performance_measurement">
+                {{ _('Mean absolute error') }}: {{ mean_absolute_error | round | int }}
+            </li>
+            <li class="performance_measurement">
+                {{ _('Median absolute error') }}: {{ median_absolute_error | round | int }}
+            </li>
+            <li class="performance_measurement">
+                {{ _('Classification accuracy') }}: {{ accuracy | round(2) }}
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <h2>{{ _('Predictions') }}</h2>
+        <table id="predictions" class="predictions">
             <tr>
-                {% set pred = row['prediction'] %}
-                {% set actual = row['actual'] %}
-                <td>{{pred.date}}</td>
-                <td>{{pred.visitors|round()|int}}</td>
-                {% if actual is not none %}
-                    <td>{{actual.visitors|round()|int}}</td>
-                    <td>{{pred.visitors|round()|int - actual.visitors|round()|int}}</td>
-                {% else %}
-                    <td></td>
-                    <td></td>
-                {% endif %}
-                <td>{{pred.visitors_class | visitors_class_to_label}}</td>
-                {% if actual is not none %}
-                    {% set class_diff = pred.visitors_class - actual.visitors_class %}
-                    <td>{{actual.visitors_class | visitors_class_to_label}}</td>
-                    <td class="prediction_class_diff_{{class_diff|abs}}">{{class_diff}}</td>
-                {% else %}
-                    <td></td>
-                    <td></td>
-                {% endif %}
+                <td>{{ _('Date') }}</td>
+                <td>{{ _('Predicted visitors') }}</td>
+                <td>{{ _('Actual visitors') }}</td>
+                <td>{{ _('Difference') }}</td>
+                <td>{{ _('Predicted visitor class') }}</td>
+                <td>{{ _('Actual visitors class') }}</td>
+                <td>{{ _('Difference') }}</td>
             </tr>
-        {% endfor %}
-    </table>
+            {% for row in predictions %}
+                <tr>
+                    {% set pred = row['prediction'] %}
+                    {% set actual = row['actual'] %}
+                    <td>{{pred.date}}</td>
+                    <td>{{pred.visitors|round()|int}}</td>
+                    {% if actual is not none %}
+                        <td>{{actual.visitors|round()|int}}</td>
+                        <td>{{pred.visitors|round()|int - actual.visitors|round()|int}}</td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
+                    <td>{{pred.visitors_class | visitors_class_to_label}}</td>
+                    {% if actual is not none %}
+                        {% set class_diff = pred.visitors_class - actual.visitors_class %}
+                        <td>{{actual.visitors_class | visitors_class_to_label}}</td>
+                        <td class="prediction_class_diff_{{class_diff|abs}}">{{class_diff}}</td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 
 {% endblock body %}

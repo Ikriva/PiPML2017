@@ -13,3 +13,7 @@ table.predictions {
 .prediction_class_diff_2 {
     background-color: red;
 }
+
+li.performance_measurement {
+    list-style: none;
+}
