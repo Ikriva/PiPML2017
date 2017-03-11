@@ -124,8 +124,8 @@ def weather_to_predictors(daily_weather_data, predictors=DEFAULT_PREDICTORS):
     Takes a list of weather forecasts or observations and returns a feature
     vector ready for passing to a classifier or regression model built by
     ModelBuilder.
-    @param daily_weather_data: the daily weather data point
-    @return: a prediction model feature vector
+    :param daily_weather_data: the daily weather data point
+    :return: a prediction model feature vector
     """
 
     weekdays = [config.WEEKDAYS[w.date.weekday()] for w in daily_weather_data]

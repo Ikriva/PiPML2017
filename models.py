@@ -137,7 +137,7 @@ def get_zoo_predictions_and_actuals():
     Returns a list of all visitor statistic predictions and actual values.
     If a prediction for a given date exists but an actual value is not available,
     the value for the ZooStatisticActual will be None.
-    @return: list of (ZooStatisticPrediction, ZooStatisticActual) tuples
+    :return: list of (ZooStatisticPrediction, ZooStatisticActual) tuples
     """
 
     results = db.session.query(ZooStatisticPrediction)\
