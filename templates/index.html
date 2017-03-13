@@ -7,9 +7,9 @@
     <h1>{{ _("Predicted visitor numbers for Helsinki Zoo") }}</h1>
 
     {% if error %}
-        <div class="errors">
-            <p class="error">{{ _(error) }}</p>
-        </div>
+    <div class="errors">
+        <p class="error">{{ _(error) }}</p>
+    </div>
     {% endif %}
 
     <div>
@@ -31,23 +31,40 @@
     </div>
 
     <div>
-        <h2>{{ _('Predictions') }}</h2>
+        <h2>{{ _('Predictions') ~ " (latest " ~ predictions|length ~ ")" }}</h2>
         <table id="predictions" class="predictions">
-            <tr>
-                <td>{{ _('Date') }}</td>
-                <td>{{ _('Predicted visitors') }}</td>
-                <td>{{ _('Actual visitors') }}</td>
-                <td>{{ _('Difference') }}</td>
-                <td>{{ _('Predicted visitor class') }}</td>
-                <td>{{ _('Actual visitors class') }}</td>
-                <td>{{ _('Difference') }}</td>
-            </tr>
-            {% for row in predictions %}
+            <colgroup span="1"></colgroup>
+            <colgroup span="3"></colgroup>
+            <colgroup span="3"></colgroup>
+            <thead>
+                <tr>
+                    <th scope="colgroup"></th>
+                    <th scope="colgroup">{{ _('Visitors') }}</th>
+                    <th></th>
+                    <th></th>
+                    <th scope="colgroup">{{ _('Visitor class') }}</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>{{ _('Date') }}</th>
+                    <th>{{ _('Predicted') }}</th>
+                    <th>{{ _('Actual') }}</th>
+                    <th>{{ _('Difference') }}</th>
+                    <th>{{ _('Predicted') }}</th>
+                    <th>{{ _('Actual') }}</th>
+                    <th>{{ _('Difference') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in predictions %}
                 <tr>
                     {% set pred = row['prediction'] %}
                     {% set actual = row['actual'] %}
+
                     <td>{{pred.date}}</td>
                     <td>{{pred.visitors|round()|int}}</td>
+
                     {% if actual is not none %}
                         <td>{{actual.visitors|round()|int}}</td>
                         <td>{{pred.visitors|round()|int - actual.visitors|round()|int}}</td>
@@ -55,6 +72,7 @@
                         <td></td>
                         <td></td>
                     {% endif %}
+
                     <td>{{pred.visitors_class | visitors_class_to_label}}</td>
                     {% if actual is not none %}
                         {% set class_diff = pred.visitors_class - actual.visitors_class %}
@@ -65,7 +83,8 @@
                         <td></td>
                     {% endif %}
                 </tr>
-            {% endfor %}
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 

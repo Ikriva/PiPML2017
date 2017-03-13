@@ -1,5 +1,6 @@
 table.predictions {
     border-spacing: 2em 0.5em;
+    //border-collapse: collapse;
 }
 
 .prediction_class_diff_0 {
@@ -17,3 +18,8 @@ table.predictions {
 li.performance_measurement {
     list-style: none;
 }
+
+th {
+    text-align: left;
+}
+
