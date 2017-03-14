@@ -88,4 +88,15 @@
         </table>
     </div>
 
+    <div id="data-sources" class="data-sources">
+        <p>Data sources:</p>
+        <p>
+            {{ _('Actual zoo visitor counts and the original zoo visitor data used for training the prediction model:') }}
+            <a href="http://www.hri.fi/fi/dataset/korkeasaaren-kavijamaarat">Korkeasaaren kävijämäärät</a> (Helsinki Zoo visitor counts).
+            {{ _('The original data has been downloaded from Helsinki Region Infoshare and produced by Helsinki Zoo under the CC BY 4.0 license.') }}
+        </p>
+        <p>
+            {{ _('The weather data used for predicting the visitor counts is from the <a href="{url}">Finnish Meteorological Institute</a>.').format(url='https://en.ilmatieteenlaitos.fi/open-data') }}
+        </p>
+    </div>
 {% endblock body %}
